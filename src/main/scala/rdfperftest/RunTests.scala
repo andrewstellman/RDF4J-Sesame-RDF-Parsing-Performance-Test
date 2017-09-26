@@ -8,6 +8,7 @@ object RunTests extends App {
   private[this] val logger = getLogger
 
   val file = File(s"test_results_${System.currentTimeMillis}.txt")
+  logger.info(s"Writing test results to ${file.name}")
 
   val warmupMillis = 10000
   val testLengthMillis = 30000
