@@ -1,0 +1,10 @@
+bin/
+.cache-main
+.cache-tests
+.classpath
+.project
+.settings/
+project/project/
+project/target/
+target/
+test_results_*.txt
