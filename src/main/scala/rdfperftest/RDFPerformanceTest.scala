@@ -34,29 +34,13 @@ object RDFPerformanceTest {
         override def run {
           val statementCollector: CountingStatementCollector =
             if (rdfEngine == RDF4J) new RDF4JCountingStatementCollector(count)
-            else if (rdfEngine == Sesame) new SesameCountingStatementCollector(count)
+            else if (rdfEngine == OpenRDF) new OpenRDFCountingStatementCollector(count)
             else ???
 
           var elapsedMillis = System.currentTimeMillis - startMillis
 
           while (running.get) {
-            val in = new ByteArrayInputStream(RDFPerformanceTest.fileBytes)
-
-            if (rdfEngine == RDF4J) {
-              import org.eclipse.rdf4j.rio.RDFFormat
-              import org.eclipse.rdf4j.rio.Rio
-              val parser = Rio.createParser(RDFFormat.TRIG)
-              parser.setRDFHandler(statementCollector.asInstanceOf[RDF4JCountingStatementCollector])
-              parser.parse(in, "http://www.stellman-greene.com/pbprdf")
-
-            } else if (rdfEngine == Sesame) {
-              import org.openrdf.rio.RDFFormat
-              import org.openrdf.rio.Rio
-              val parser = Rio.createParser(RDFFormat.TRIG)
-              parser.setRDFHandler(statementCollector.asInstanceOf[SesameCountingStatementCollector])
-              parser.parse(in, "http://www.stellman-greene.com/pbprdf")
-
-            } else ???
+            parseFileOnce(rdfEngine, statementCollector)
 
             logger.debug(s"[$id] Done parsing RDF in ${System.currentTimeMillis - startMillis}ms")
 
@@ -90,4 +74,31 @@ object RDFPerformanceTest {
     testStats.rate
   }
 
+  def getStatementCollector(rdfEngine: RDFEngine, count: AtomicInteger) = {
+    val statementCollector: CountingStatementCollector =
+      if (rdfEngine == RDF4J) new RDF4JCountingStatementCollector(count)
+      else if (rdfEngine == OpenRDF) new OpenRDFCountingStatementCollector(count)
+      else ???
+    statementCollector
+  }
+
+  def parseFileOnce(rdfEngine: RDFEngine, statementCollector: CountingStatementCollector) = {
+    val in = new ByteArrayInputStream(RDFPerformanceTest.fileBytes)
+
+    if (rdfEngine == RDF4J) {
+      import org.eclipse.rdf4j.rio.RDFFormat
+      import org.eclipse.rdf4j.rio.Rio
+      val parser = Rio.createParser(RDFFormat.TRIG)
+      parser.setRDFHandler(statementCollector.asInstanceOf[RDF4JCountingStatementCollector])
+      parser.parse(in, "http://www.stellman-greene.com/pbprdf")
+
+    } else if (rdfEngine == OpenRDF) {
+      import org.openrdf.rio.RDFFormat
+      import org.openrdf.rio.Rio
+      val parser = Rio.createParser(RDFFormat.TRIG)
+      parser.setRDFHandler(statementCollector.asInstanceOf[OpenRDFCountingStatementCollector])
+      parser.parse(in, "http://www.stellman-greene.com/pbprdf")
+
+    } else ???
+  }
 }

@@ -20,7 +20,7 @@ class RDF4JCountingStatementCollector(count: AtomicInteger) extends CountingStat
   }
 }
 
-class SesameCountingStatementCollector(count: AtomicInteger) extends CountingStatementCollector(count) with org.openrdf.rio.RDFHandler {
+class OpenRDFCountingStatementCollector(count: AtomicInteger) extends CountingStatementCollector(count) with org.openrdf.rio.RDFHandler {
   def handleStatement(statement: org.openrdf.model.Statement): Unit = {
     count.incrementAndGet
   }
